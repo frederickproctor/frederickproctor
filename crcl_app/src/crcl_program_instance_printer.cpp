@@ -44,6 +44,42 @@ static int handleSetEndEffectorType(SetEndEffectorType *cmd)
     );
 }
 
+static int handleSetLengthUnitsType(SetLengthUnitsType *cmd)
+{
+  // can be 'meter', 'millimeter', or 'inch'
+  printf("SetLengthUnitsType(%d) %s\n",
+	 cmd->CommandID->val,
+	 cmd->UnitName->val.c_str()
+    );
+}
+
+static int handleSetAngleUnitsType(SetAngleUnitsType *cmd)
+{
+  // can be 'radian', or 'degree'
+  printf("SetAngleUnitsType(%d) %s\n",
+	 cmd->CommandID->val,
+	 cmd->UnitName->val.c_str()
+    );
+}
+
+static int handleSetTransSpeedType(SetTransSpeedType *cmd)
+{
+  TransSpeedAbsoluteType *a;
+  TransSpeedRelativeType *r;
+
+  printf("SetTransSpeedType(%d) ",
+	 cmd->CommandID->val
+    );
+
+  if (NULL != (a = dynamic_cast<TransSpeedAbsoluteType *>(cmd->TransSpeed))) {
+    printf("absolute %f\n", a->Setting->val);
+  } else if (NULL != (r = dynamic_cast<TransSpeedRelativeType *>(cmd->TransSpeed))) {
+    printf("relative %f\n", r->Fraction->val);
+  } else {
+    printf("unknown\n");
+  }
+}
+
 int main(int argc, char * argv[])
 {
   FILE * inFile;
@@ -64,6 +100,9 @@ int main(int argc, char * argv[])
 
   crcl_program_instance_handler_register(MoveToType, handleMoveToType);
   crcl_program_instance_handler_register(SetEndEffectorType, handleSetEndEffectorType);
+  crcl_program_instance_handler_register(SetLengthUnitsType, handleSetLengthUnitsType);
+  crcl_program_instance_handler_register(SetAngleUnitsType, handleSetAngleUnitsType);
+  crcl_program_instance_handler_register(SetTransSpeedType, handleSetTransSpeedType);
 
   crcl_program_instance_handler_run();
 
